@@ -149,11 +149,26 @@ ltc <- read_parquet(path(gen_health_data_dir, "LTC_from_SLF.parquet")) %>%
 
 # Time objects
 
-latest_year_life_exp_loc <- max(filter(life_exp, area_type == "HSCP")$year)
-latest_year_life_exp_otherareas <- max(life_exp$year)
+latest_year_life_exp_loc <- life_exp |>
+  filter(area_type == "Locality") |>
+  pull(year) |>
+  max()
+latest_year_life_exp_otherareas <- max(life_exp[["year"]])
 
-latest_period_life_exp_loc <- unique(filter(life_exp, area_type == "HSCP" & year == latest_year_life_exp_loc)$period_short)
-latest_period_life_exp_otherareas <- unique(filter(life_exp, area_type == "Scotland" & year == latest_year_life_exp_otherareas)$period_short)
+latest_period_life_exp_loc <- life_exp |>
+  filter(
+    area_type == "Locality",
+    year == latest_year_life_exp_loc
+  ) |>
+  pull(period_short) |>
+  unique()
+latest_period_life_exp_otherareas <- life_exp |>
+  filter(
+    area_type == "Scotland",
+    year == latest_year_life_exp_otherareas
+  ) |>
+  pull(period_short) |>
+  unique()
 
 
 # Create time trend
