@@ -234,7 +234,7 @@ avg_life_exp_latest_male <- ifelse(
   filter(
     life_exp,
     sex == "Male",
-    year == latest_year_life_exp_loc,
+    year == latest_year_life_exp_otherareas,
     area_name == HSCP,
     area_type == "HSCP"
   ) |>
@@ -248,7 +248,7 @@ avg_life_exp_latest_fem <- ifelse(
   filter(
     life_exp,
     sex == "Female",
-    year == latest_year_life_exp_loc,
+    year == latest_year_life_exp_otherareas,
     area_name == HSCP,
     area_type == "HSCP"
   ) |>
