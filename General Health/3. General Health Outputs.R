@@ -228,7 +228,7 @@ life_exp_table <- life_exp %>%
 ## Numbers for text
 locality_missing <- HSCP %in% check_missing_data_scotpho(life_exp)$area_name
 
-avg_life_exp_latest_male <- ifelse(
+avg_life_exp_latest_male <- if_else(
   locality_missing,
   NA_real_,
   filter(
@@ -242,7 +242,7 @@ avg_life_exp_latest_male <- ifelse(
     round_half_up(digits = 1)
 )
 
-avg_life_exp_latest_fem <- ifelse(
+avg_life_exp_latest_fem <- if_else(
   locality_missing,
   NA_real_,
   filter(
