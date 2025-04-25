@@ -233,9 +233,9 @@ if (LOCALITY %in% check_missing_data_scotpho(life_exp)$area_name) {
 } else {
   avg_life_exp_latest <- life_exp |>
     filter(
-      year == latest_year_life_exp_loc,
-      area_name == LOCALITY,
-      area_type == "Locality"
+      year == latest_year_life_exp_otherareas,
+      area_name == HSCP,
+      area_type == "HSCP"
     )
 
   avg_life_exp_latest_male <- avg_life_exp_latest |>
