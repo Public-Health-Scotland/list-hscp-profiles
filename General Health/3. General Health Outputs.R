@@ -227,7 +227,7 @@ life_exp_table <- life_exp %>%
 
 ## Numbers for text
 
-if (LOCALITY %in% check_missing_data_scotpho(life_exp)$area_name) {
+if (HSCP %in% check_missing_data_scotpho(life_exp)$area_name) {
   avg_life_exp_latest_male <- NA_real_
   avg_life_exp_latest_fem <- NA_real_
 } else {
