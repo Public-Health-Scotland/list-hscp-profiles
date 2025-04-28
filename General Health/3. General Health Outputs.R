@@ -170,7 +170,6 @@ latest_period_life_exp_otherareas <- life_exp |>
   pull(period_short) |>
   unique()
 
-
 # Create time trend
 life_exp_trend <- life_exp %>%
   filter(
@@ -226,7 +225,6 @@ life_exp_table <- life_exp %>%
 
 
 ## Numbers for text
-
 if (HSCP %in% check_missing_data_scotpho(life_exp)$area_name) {
   avg_life_exp_latest_male <- NA_real_
   avg_life_exp_latest_fem <- NA_real_
