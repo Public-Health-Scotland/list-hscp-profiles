@@ -47,7 +47,7 @@ pop_min_year <- pop_max_year - 5
 ## Population data manipulation
 pop_10y_groups <- pop_raw_data |>
   filter(
-    hscp_locality == LOCALITY,
+    hscp2019name == HSCP,
     year == max(year)
   ) |>
   select(sex, starts_with("age")) |>
