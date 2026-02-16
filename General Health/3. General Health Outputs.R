@@ -630,12 +630,13 @@ ppl_faint_o85 <- readPNG(path(
 
 # LTC infographic waffle chart
 create_infographic <- function(
-    image1,
-    image2,
-    perc_ltc,
-    col,
-    age_label1,
-    age_label2) {
+  image1,
+  image2,
+  perc_ltc,
+  col,
+  age_label1,
+  age_label2
+) {
   ggplot() +
     scale_x_continuous(name = "x") +
     scale_y_continuous(name = "y") +
