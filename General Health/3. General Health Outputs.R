@@ -37,15 +37,6 @@ lookup <- read_in_localities()
 # Determine HSCP and HB based on Locality
 HB <- unique(as.character(filter(lookup, hscp2019name == HSCP)$hb2019name))
 
-# Determine other localities based on LOCALITY object
-other_locs <- lookup %>%
-  select(hscp_locality, hscp2019name) %>%
-  filter(hscp2019name == HSCP) %>%
-  arrange(hscp_locality)
-
-# Find number of locs per partnership
-n_loc <- count_localities(lookup, HSCP)
-
 ### Import + clean datasets ----
 
 # Life expectancy
@@ -183,23 +174,12 @@ ltc <- read_parquet(path(gen_health_data_dir, "LTC_from_SLF.parquet")) %>%
 
 # Time objects
 
-latest_year_life_exp_loc <- life_exp |>
-  filter(area_type == "Locality") |>
-  pull(year) |>
-  max()
-latest_year_life_exp_otherareas <- max(life_exp[["year"]])
+latest_year_life_exp <- max(life_exp[["year"]])
 
-latest_period_life_exp_loc <- life_exp |>
-  filter(
-    area_type == "Locality",
-    year == latest_year_life_exp_loc
-  ) |>
-  pull(period_short) |>
-  unique()
-latest_period_life_exp_otherareas <- life_exp |>
+latest_period_life_exp <- life_exp |>
   filter(
     area_type == "Scotland",
-    year == latest_year_life_exp_otherareas
+    year == latest_year_life_exp
   ) |>
   pull(period_short) |>
   unique()
@@ -252,7 +232,7 @@ life_exp_trend <- life_exp %>%
 
 life_exp_table <- life_exp %>%
   filter(
-    year == latest_year_life_exp_otherareas,
+    year == latest_year_life_exp,
     area_name %in% c(HB, HSCP, "Scotland")
   ) %>%
   mutate(
@@ -274,7 +254,7 @@ if (HSCP %in% check_missing_data_scotpho(life_exp)$area_name) {
 } else {
   avg_life_exp_latest <- filter(
     life_exp,
-    year == latest_year_life_exp_otherareas,
+    year == latest_year_life_exp,
     area_name == HSCP,
     area_type == "HSCP"
   )
@@ -546,11 +526,10 @@ adp_presc_diff_scot <- if_else(
 
 ############################ 3) SLF DATA (LTCs) ####################################
 
-# Keeping below in as we are still using locality outputs at the moment
 # Extract SLF adjusted populations
 slf_pops <- distinct(ltc, age_group, hscp_locality, hscp2019name, slf_adj_pop)
 
-slf_pop_loc <- slf_pops %>%
+slf_pop_hscp <- slf_pops %>%
   distinct(age_group, hscp2019name, slf_adj_pop) |>
   filter(hscp2019name == HSCP) |>
   # group by to get to HSCP level
@@ -698,9 +677,9 @@ ltc_infographic <- ltc %>%
   summarise(people = sum(people)) %>%
   ungroup() %>%
   # the line above gives a summary table by age_group by hscp2019_name
-  # then the slf population by locality is added onto the table
+  # then the slf population by hscp is added onto the table
   # this can be tidied up longer term I guess
-  left_join(slf_pop_loc, by = join_by(hscp2019name, age_group)) %>%
+  left_join(slf_pop_hscp, by = join_by(hscp2019name, age_group)) %>%
   # need a group by below that takes max of people and sum of slf_adj_pop
   # by hscp2019name and by age_group drop hscp_locality
   # select(-hscp_locality) |>
@@ -872,8 +851,8 @@ ltc_multimorbidity <- ltc_age_grouped %>%
   mutate(
     ltc_pop = if_else(
       age_group == "Under 65",
-      filter(slf_pop_loc, age_group == "Under 65")$slf_adj_pop,
-      sum(filter(slf_pop_loc, age_group != "Under 65")$slf_adj_pop)
+      filter(slf_pop_hscp, age_group == "Under 65")$slf_adj_pop,
+      sum(filter(slf_pop_hscp, age_group != "Under 65")$slf_adj_pop)
     )
   ) %>%
   group_by(age_group) %>%
@@ -927,7 +906,7 @@ ltc_types_temp <- ltc_types %>%
   filter(age_group == "Under 65") %>%
   mutate(
     percent = (value /
-      (filter(slf_pop_loc, age_group == "Under 65")$slf_adj_pop) *
+      (filter(slf_pop_hscp, age_group == "Under 65")$slf_adj_pop) *
       -100)
   )
 
@@ -935,7 +914,7 @@ ltc_types <- ltc_types %>%
   filter(age_group == "65+") %>%
   mutate(
     percent = (value /
-      sum(filter(slf_pop_loc, age_group != "Under 65")$slf_adj_pop) *
+      sum(filter(slf_pop_hscp, age_group != "Under 65")$slf_adj_pop) *
       100)
   ) %>%
   bind_rows(ltc_types_temp)
@@ -1077,7 +1056,7 @@ ltc_totals <- ltc2 %>%
 
 
 # Extract population totals to make %
-ltc_pops_total_loc <- sum(slf_pop_loc$slf_adj_pop)
+ltc_pops_total_hscp_slf <- sum(slf_pop_hscp$slf_adj_pop)
 ltc_pops_total_scot <- sum(slf_pops$slf_adj_pop)
 ltc_pops_total_hscp <- sum(filter(slf_pops, hscp2019name == HSCP)$slf_adj_pop)
 
@@ -1105,8 +1084,6 @@ ltc_colours <- ltc_scot |>
       )
     )
   )
-
-# Top 5 locality
 
 # Top 5 HSCP
 top5ltc_hscp <- ltc_totals %>%
@@ -1162,8 +1139,6 @@ top5_ltc_table <- bind_cols(
 
 rm(
   ltc_colours,
-  ltc_pops_total_loc,
-  loc.ltc.table,
   hscp.ltc.table,
   top5ltc_hscp,
   top5ltc_scot
@@ -1185,91 +1160,6 @@ ltc_diff_scot <- if_else(
 
 ############################### 4) CODE FOR SUMMARY TABLE ###############################
 
-## Make GH objects table for hscp, scot AND other localities in the partnership
-
-# Function to get latest data from scotpho
-
-other_locs_summary_table <- function(data, latest_year) {
-  data %>%
-    filter(
-      year == latest_year,
-      area_type == "Locality"
-    ) %>%
-    rename("hscp_locality" = "area_name") %>%
-    right_join(other_locs, by = join_by(hscp_locality)) %>%
-    arrange(hscp_locality) %>%
-    select(hscp_locality, measure) %>%
-    mutate(measure = round_half_up(measure, 1)) %>%
-    pivot_wider(names_from = hscp_locality, values_from = measure)
-}
-
-hscp_scot_summary_table <- function(data, latest_year, area) {
-  type <- if_else(area == HSCP, "HSCP", "Scotland")
-  temp <- filter(
-    data,
-    year == latest_year,
-    area_name == area,
-    area_type == type
-  )
-
-  round_half_up(temp[["measure"]], digits = 1)
-}
-
-# 1. Other localities
-
-# male life expectancy
-other_locs_life_exp_male <- other_locs_summary_table(
-  data = filter(life_exp, sex == "Male"),
-  latest_year = latest_year_life_exp_loc
-)
-
-# female life exp
-other_locs_life_exp_fem <- other_locs_summary_table(
-  data = filter(life_exp, sex == "Female"),
-  latest_year = latest_year_life_exp_loc
-)
-
-## deaths 15-44
-other_locs_deaths_15_44 <- other_locs_summary_table(
-  deaths_15_44,
-  latest_year = max(deaths_15_44$year)
-)
-
-
-## Cancer
-other_locs_cancer <- other_locs_summary_table(
-  cancer_reg,
-  latest_year = max(cancer_reg$year)
-)
-
-## ADP
-other_locs_adp <- other_locs_summary_table(
-  adp_presc,
-  latest_year = max(adp_presc$year)
-)
-
-
-## ltc
-otherloc_ltc_pops <- slf_pops %>%
-  inner_join(other_locs, by = "hscp_locality") %>%
-  group_by(hscp_locality) %>%
-  summarise(slf_adj_pop = sum(slf_adj_pop)) %>%
-  ungroup()
-
-other_locs_ltc <- ltc |>
-  inner_join(other_locs, by = join_by(hscp2019name, hscp_locality)) %>%
-  select(hscp_locality, total_ltc, people) %>%
-  filter(total_ltc >= 1) %>%
-  group_by(hscp_locality) %>%
-  summarise(ltc_people = sum(people)) %>%
-  ungroup() %>%
-  left_join(otherloc_ltc_pops, by = "hscp_locality") %>%
-  mutate(percent = round_half_up(ltc_people / slf_adj_pop * 100, 1)) %>%
-  arrange(hscp_locality) %>%
-  select(hscp_locality, percent) %>%
-  pivot_wider(names_from = hscp_locality, values_from = percent)
-
-
 # 2. HSCP
 
 if (HSCP == "Clackmannanshire and Stirling") {
@@ -1278,13 +1168,13 @@ if (HSCP == "Clackmannanshire and Stirling") {
 } else {
   hscp_life_exp_male <- hscp_scot_summary_table(
     data = filter(life_exp, sex == "Male"),
-    latest_year = latest_year_life_exp_otherareas,
+    latest_year = latest_year_life_exp,
     area = HSCP
   )
 
   hscp_life_exp_fem <- hscp_scot_summary_table(
     data = filter(life_exp, sex == "Female"),
-    latest_year = latest_year_life_exp_otherareas,
+    latest_year = latest_year_life_exp,
     area = HSCP
   )
 }
@@ -1313,13 +1203,13 @@ hscp_ltc <- round_half_up(ltc_hscp / ltc_pops_total_hscp * 100, 1)
 
 scot_life_exp_male <- hscp_scot_summary_table(
   data = filter(life_exp, sex == "Male"),
-  latest_year = latest_year_life_exp_otherareas,
+  latest_year = latest_year_life_exp,
   area = "Scotland"
 )
 
 scot_life_exp_fem <- hscp_scot_summary_table(
   data = filter(life_exp, sex == "Female"),
-  latest_year = latest_year_life_exp_otherareas,
+  latest_year = latest_year_life_exp,
   area = "Scotland"
 )
 
@@ -1355,7 +1245,7 @@ rm(
   early_deaths_cancer_rate_earliest,
   gen_health_data_dir,
   hscp_scot_summary_table,
-  latest_year_life_exp_loc,
+  latest_year_life_exp,
   ltc_age_grouped,
   ltc_infographic,
   ltc_pops_total_hscp,
@@ -1363,11 +1253,8 @@ rm(
   ltc_hscp,
   ltc_scot,
   ltc_totals,
-  other_locs,
-  other_locs_summary_table,
-  otherloc_ltc_pops,
   prev_period_cancer_reg,
-  slf_pop_loc,
+  slf_pop_hscp,
   slf_pops,
   table8_year_title
 )

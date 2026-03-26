@@ -15,7 +15,7 @@ figure_num <- figure_num + 1
 
 ```{r }
 fpar(
-  ftext(paste0("Table ", table_num, ": Number of each type of service in ", LOCALITY, " Locality"), table_heading_style),
+  ftext(paste0("Table ", table_num, ": Number of each type of service in ", HSCP, " HSCP"), table_heading_style),
   ftext("2", table_heading_superscript_style) # Superscript
 )
 

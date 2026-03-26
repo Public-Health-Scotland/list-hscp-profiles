@@ -14,7 +14,7 @@ library(phsstyles)
 # Set locality name object (with automatic wrapping)
 
 # Set other localities names
-other_loc_names <- paste(other_locs$hscp_locality, "Locality", sep = "\n") |>
+other_loc_names <- paste(other_locs$hscp_locality, sep = "\n") |>
   str_wrap(width = case_when(n_loc < 4 ~ 20, n_loc == 4 ~ 15, n_loc > 4 ~ 8))
 
 # Set HSCP name object
@@ -90,7 +90,7 @@ demographic_values <- tibble(
   hscp_values, scot_values
 )
 
-colnames(demographic_values) <- c("Demographic Indicators", headings)
+colnames(demographic_values) <- c("Indicators", headings)
 
 demographics_table <- make_summary_table(demographic_values)
 
