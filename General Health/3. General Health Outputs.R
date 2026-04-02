@@ -1150,9 +1150,8 @@ top5_ltc_table <- bind_cols(
 ) |>
   flextable(cwidth = 2) |>
   lp_flextable_theme() |>
-  bg(j = 1, bg = top5ltc_loc$colours) |>
-  bg(j = 2, bg = top5ltc_hscp$colours) |>
-  bg(j = 3, bg = top5ltc_scot$colours) |>
+  bg(j = 1, bg = top5ltc_hscp$colours) |>
+  bg(j = 2, bg = top5ltc_scot$colours) |>
   font(fontname = "Arial", part = "all") |>
   color(color = "white", part = "body") |>
   bold(part = "header") |>
