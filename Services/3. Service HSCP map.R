@@ -44,7 +44,7 @@ shp_hscp <- read_sf(path(
   mutate(
     hscp_locality = str_wrap(gsub("&", "and", hscp_local, fixed = TRUE), 24),
     hscp_local = str_wrap(hscp_local, 24),
-    border_thickness = if_else(hscp_locality == LOCALITY, 0.2, 0.1)
+    border_thickness = 0.2
   )
 
 # 3. Map Code ----
@@ -175,23 +175,7 @@ service_map <- ggmap(service_map_background) +
     inherit.aes = FALSE
   ) +
   scale_linewidth(range = c(0.2, 1), guide = "none") +
-  labs(fill = "Locality") +
-  geom_sf(
-    data = shp_hscp |> dplyr::filter(hscp_locality == LOCALITY),
-    fill = NA, #  keep original fill visible
-    colour = "white", #E63946",         #  highlight colour
-    linewidth = 1.5, #  strong border
-    alpha = 0.3,
-    inherit.aes = FALSE
-  ) +
-  # crisp border on top
-  geom_sf(
-    data = shp_hscp |> dplyr::filter(hscp_locality == LOCALITY),
-    fill = NA,
-    colour = "#3F085C",
-    linewidth = 0.8,
-    inherit.aes = FALSE
-  )
+  labs(fill = "Locality")
 
 # check if services markers exist for locality
 if (nrow(markers_gp) > 0) {
@@ -300,7 +284,7 @@ service_map <- service_map +
 # Add highlight variable to your shapefile
 shp_hscp <- shp_hscp |>
   mutate(
-    highlight = if_else(hscp_locality == LOCALITY, "Selected", "Other")
+    highlight = "Other"
   )
 
 # Create legend-aware map
@@ -326,11 +310,7 @@ service_map_1 <- ggmap(service_map_background) +
   guides(
     fill = guide_legend(
       override.aes = list(
-        colour = ifelse(
-          levels(factor(shp_hscp$hscp_local)) == LOCALITY,
-          "#3F085C",
-          "white"
-        ),
+        colour = "white",
         linewidth = 1
       )
     )

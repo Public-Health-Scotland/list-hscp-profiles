@@ -155,7 +155,7 @@ hscp_values <- c(hscp_life_exp_male, hscp_life_exp_fem, hscp_deaths_15_44, hscp_
 scot_values <- c(scot_life_exp_male, scot_life_exp_fem, scot_deaths_15_44, ltc_perc_scot, scot_cancer, scot_adp_presc)
 
 population_health_values <- tibble(
-  indicators, datatype, time, loc_values, other_loc_values,
+  indicators, datatype, time, other_loc_values,
   hscp_values, scot_values
 )
 

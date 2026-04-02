@@ -28,6 +28,9 @@ ext_year <- 2025
 # Locality lookup
 lookup <- read_in_localities(dz_level = TRUE)
 
+# Get number of localities in HSCP
+n_loc <- count_localities(read_in_localities(), HSCP)
+
 
 ###### 2. Read in services data ######
 
