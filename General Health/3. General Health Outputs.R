@@ -910,7 +910,7 @@ ltc_multimorbidity_ov65_perc <- sum(
 
 
 # ###### 3c Prevalence of LTC Types ######
-ltc_types <- ltc2 %>%
+ltc_types <- ltc_age_grouped %>%
   select(-hscp_locality, -total_ltc, -people) %>%
   filter(hscp2019name == HSCP) %>%
   group_by(hscp2019name, age_group) %>%
@@ -1068,7 +1068,7 @@ rm(
 ##### 3d Top LTCs Table #####
 
 # Most common LTC all round
-ltc_totals <- ltc2 %>%
+ltc_totals <- ltc_age_grouped %>%
   filter(total_ltc != 0) %>%
   select(-hscp_locality, -total_ltc, -age_group) %>%
   group_by(hscp2019name) %>%
