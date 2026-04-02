@@ -187,8 +187,7 @@ latest_year_life_exp_loc <- life_exp |>
   filter(area_type == "Locality") |>
   pull(year) |>
   max()
-
-latest_year_life_exp <- max(life_exp[["year"]])
+latest_year_life_exp_otherareas <- max(life_exp[["year"]])
 
 latest_period_life_exp_loc <- life_exp |>
   filter(
@@ -197,11 +196,10 @@ latest_period_life_exp_loc <- life_exp |>
   ) |>
   pull(period_short) |>
   unique()
-
-latest_period_life_exp <- life_exp |>
+latest_period_life_exp_otherareas <- life_exp |>
   filter(
     area_type == "Scotland",
-    year == latest_year_life_exp
+    year == latest_year_life_exp_otherareas
   ) |>
   pull(period_short) |>
   unique()
@@ -254,7 +252,7 @@ life_exp_trend <- life_exp %>%
 
 life_exp_table <- life_exp %>%
   filter(
-    year == latest_year_life_exp,
+    year == latest_year_life_exp_otherareas,
     area_name %in% c(HB, HSCP, "Scotland")
   ) %>%
   mutate(
@@ -276,7 +274,7 @@ if (HSCP %in% check_missing_data_scotpho(life_exp)$area_name) {
 } else {
   avg_life_exp_latest <- filter(
     life_exp,
-    year == latest_year_life_exp,
+    year == latest_year_life_exp_otherareas,
     area_name == HSCP,
     area_type == "HSCP"
   )
@@ -551,7 +549,7 @@ adp_presc_diff_scot <- if_else(
 # Extract SLF adjusted populations
 slf_pops <- distinct(ltc, age_group, hscp_locality, hscp2019name, slf_adj_pop)
 
-slf_pop_hscp <- slf_pops %>%
+slf_pop_loc <- slf_pops %>%
   distinct(age_group, hscp2019name, slf_adj_pop) |>
   filter(hscp2019name == HSCP) |>
   # group by to get to HSCP level
@@ -702,7 +700,7 @@ ltc_infographic <- ltc %>%
   # the line above gives a summary table by age_group by hscp2019_name
   # then the slf population by hscp is added onto the table
   # this can be tidied up longer term I guess
-  left_join(slf_pop_hscp, by = join_by(hscp2019name, age_group)) %>%
+  left_join(slf_pop_loc, by = join_by(hscp2019name, age_group)) %>%
   # need a group by below that takes max of people and sum of slf_adj_pop
   # by hscp2019name and by age_group drop hscp_locality
   # select(-hscp_locality) |>
@@ -874,8 +872,8 @@ ltc_multimorbidity <- ltc_age_grouped %>%
   mutate(
     ltc_pop = if_else(
       age_group == "Under 65",
-      filter(slf_pop_hscp, age_group == "Under 65")$slf_adj_pop,
-      sum(filter(slf_pop_hscp, age_group != "Under 65")$slf_adj_pop)
+      filter(slf_pop_loc, age_group == "Under 65")$slf_adj_pop,
+      sum(filter(slf_pop_loc, age_group != "Under 65")$slf_adj_pop)
     )
   ) %>%
   group_by(age_group) %>%
@@ -912,7 +910,7 @@ ltc_multimorbidity_ov65_perc <- sum(
 
 
 # ###### 3c Prevalence of LTC Types ######
-ltc_types <- ltc_age_grouped %>%
+ltc_types <- ltc2 %>%
   select(-hscp_locality, -total_ltc, -people) %>%
   filter(hscp2019name == HSCP) %>%
   group_by(hscp2019name, age_group) %>%
@@ -929,7 +927,7 @@ ltc_types_temp <- ltc_types %>%
   filter(age_group == "Under 65") %>%
   mutate(
     percent = (value /
-      (filter(slf_pop_hscp, age_group == "Under 65")$slf_adj_pop) *
+      (filter(slf_pop_loc, age_group == "Under 65")$slf_adj_pop) *
       -100)
   )
 
@@ -937,7 +935,7 @@ ltc_types <- ltc_types %>%
   filter(age_group == "65+") %>%
   mutate(
     percent = (value /
-      sum(filter(slf_pop_hscp, age_group != "Under 65")$slf_adj_pop) *
+      sum(filter(slf_pop_loc, age_group != "Under 65")$slf_adj_pop) *
       100)
   ) %>%
   bind_rows(ltc_types_temp)
@@ -1070,7 +1068,7 @@ rm(
 ##### 3d Top LTCs Table #####
 
 # Most common LTC all round
-ltc_totals <- ltc_age_grouped %>%
+ltc_totals <- ltc2 %>%
   filter(total_ltc != 0) %>%
   select(-hscp_locality, -total_ltc, -age_group) %>%
   group_by(hscp2019name) %>%
@@ -1079,7 +1077,7 @@ ltc_totals <- ltc_age_grouped %>%
 
 
 # Extract population totals to make %
-ltc_pops_total_hscp_slf <- sum(slf_pop_hscp$slf_adj_pop)
+ltc_pops_total_loc <- sum(slf_pop_loc$slf_adj_pop)
 ltc_pops_total_scot <- sum(slf_pops$slf_adj_pop)
 ltc_pops_total_hscp <- sum(filter(slf_pops, hscp2019name == HSCP)$slf_adj_pop)
 
@@ -1152,8 +1150,9 @@ top5_ltc_table <- bind_cols(
 ) |>
   flextable(cwidth = 2) |>
   lp_flextable_theme() |>
-  bg(j = 1, bg = top5ltc_hscp$colours) |>
-  bg(j = 2, bg = top5ltc_scot$colours) |>
+  bg(j = 1, bg = top5ltc_loc$colours) |>
+  bg(j = 2, bg = top5ltc_hscp$colours) |>
+  bg(j = 3, bg = top5ltc_scot$colours) |>
   font(fontname = "Arial", part = "all") |>
   color(color = "white", part = "body") |>
   bold(part = "header") |>
@@ -1161,6 +1160,8 @@ top5_ltc_table <- bind_cols(
 
 rm(
   ltc_colours,
+  ltc_pops_total_loc,
+  loc.ltc.table,
   hscp.ltc.table,
   top5ltc_hscp,
   top5ltc_scot
@@ -1266,6 +1267,7 @@ other_locs_ltc <- ltc |>
   select(hscp_locality, percent) %>%
   pivot_wider(names_from = hscp_locality, values_from = percent)
 
+
 # 2. HSCP
 
 if (HSCP == "Clackmannanshire and Stirling") {
@@ -1274,13 +1276,13 @@ if (HSCP == "Clackmannanshire and Stirling") {
 } else {
   hscp_life_exp_male <- hscp_scot_summary_table(
     data = filter(life_exp, sex == "Male"),
-    latest_year = latest_year_life_exp,
+    latest_year = latest_year_life_exp_otherareas,
     area = HSCP
   )
 
   hscp_life_exp_fem <- hscp_scot_summary_table(
     data = filter(life_exp, sex == "Female"),
-    latest_year = latest_year_life_exp,
+    latest_year = latest_year_life_exp_otherareas,
     area = HSCP
   )
 }
@@ -1309,13 +1311,13 @@ hscp_ltc <- round_half_up(ltc_hscp / ltc_pops_total_hscp * 100, 1)
 
 scot_life_exp_male <- hscp_scot_summary_table(
   data = filter(life_exp, sex == "Male"),
-  latest_year = latest_year_life_exp,
+  latest_year = latest_year_life_exp_otherareas,
   area = "Scotland"
 )
 
 scot_life_exp_fem <- hscp_scot_summary_table(
   data = filter(life_exp, sex == "Female"),
-  latest_year = latest_year_life_exp,
+  latest_year = latest_year_life_exp_otherareas,
   area = "Scotland"
 )
 
@@ -1351,7 +1353,7 @@ rm(
   early_deaths_cancer_rate_earliest,
   gen_health_data_dir,
   hscp_scot_summary_table,
-  latest_year_life_exp,
+  latest_year_life_exp_loc,
   ltc_age_grouped,
   ltc_infographic,
   ltc_pops_total_hscp,
@@ -1359,8 +1361,11 @@ rm(
   ltc_hscp,
   ltc_scot,
   ltc_totals,
+  other_locs,
+  other_locs_summary_table,
+  otherloc_ltc_pops,
   prev_period_cancer_reg,
-  slf_pop_hscp,
+  slf_pop_loc,
   slf_pops,
   table8_year_title
 )

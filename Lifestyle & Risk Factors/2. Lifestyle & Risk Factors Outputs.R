@@ -30,6 +30,17 @@ ext_year <- 2024
 # Locality lookup
 lookup <- read_in_localities()
 
+# Determine HSCP and HB based on Loc
+HB <- unique(as.character(filter(lookup, hscp2019name == HSCP)$hb2019name))
+
+# Determine other localities based on LOCALITY object
+other_locs <- lookup %>%
+  select(hscp_locality, hscp2019name) %>%
+  filter(hscp2019name == HSCP) %>%
+  arrange(hscp_locality)
+
+# Find number of locs per partnership
+n_loc <- count_localities(lookup, HSCP)
 
 
 ### Import + clean datasets ----
@@ -391,6 +402,43 @@ bowel_screening_diff_scot <- if_else(
 ############################### 3) CODE FOR SUMMARY TABLE ###############################
 
 ## Make GH objects table for hscp, scot AND other localities in the partnership
+
+# Function to get latest data from scotpho for other localities
+
+other_locs_summary_table <- function(data, latest_year) {
+  data %>%
+    filter(year == latest_year) %>%
+    filter(area_type == "Locality") %>%
+    rename("hscp_locality" = "area_name") %>%
+    right_join(other_locs, by = join_by(hscp_locality)) %>%
+    arrange(hscp_locality) %>%
+    select(hscp_locality, measure) %>%
+    mutate(measure = round_half_up(measure, 1)) %>%
+    pivot_wider(names_from = hscp_locality, values_from = measure)
+}
+
+# 1. Other locs
+
+other_locs_drug_hosp <- other_locs_summary_table(
+  drug_hosp,
+  latest_year = max(drug_hosp$year)
+)
+
+other_locs_alcohol_hosp <- other_locs_summary_table(
+  alcohol_hosp,
+  latest_year = max(alcohol_hosp$year)
+)
+
+other_locs_alcohol_deaths <- other_locs_summary_table(
+  alcohol_deaths,
+  latest_year = max(alcohol_deaths$year)
+)
+
+other_locs_bowel_screening <- other_locs_summary_table(
+  bowel_screening,
+  latest_year = max(bowel_screening$year)
+)
+
 
 # 2. HSCP
 
