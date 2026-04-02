@@ -286,7 +286,96 @@ perc_houses_FH <- format_number_for_text(
 
 ########################## Section 4 - Objects for Summary Table ########################
 
-# 1. HSCP
+## Relevant lookups for creating the table objects
+
+# Global Script Function to read in Localities Lookup
+lookup2 <- read_in_localities(dz_level = FALSE)
+
+
+# Determine other localities based on LOCALITY object
+other_locs <- lookup2 %>%
+  select(hscp_locality, hscp2019name) %>%
+  filter(hscp2019name == HSCP) %>%
+  arrange(hscp_locality)
+
+# Find number of locs per partnership
+n_loc <- count_localities(lookup2, HSCP)
+
+rm(lookup2)
+
+
+# 1. Other localities
+
+# Global Script Function to read in Localities Lookup
+other_locs_dz <- read_in_localities(dz_level = TRUE) %>%
+  arrange() %>%
+  select(datazone2011, hscp_locality) %>%
+  inner_join(other_locs, by = c("hscp_locality" = "hscp_locality"))
+
+house_dat_otherlocs <- house_raw_dat %>%
+  inner_join(other_locs_dz, by = c("data_zone_code" = "datazone2011")) %>%
+  filter(year == max(year)) %>%
+  group_by(hscp_locality) %>%
+  summarise(
+    total_dwellings = sum(total_number_of_dwellings),
+    tax_discount = sum(dwellings_with_a_single_adult_council_tax_discount)
+  ) %>%
+  ungroup() %>%
+  mutate(
+    tax_discount_perc = round_half_up(tax_discount / total_dwellings * 100, 1)
+  )
+
+other_locs_n_houses <- house_dat_otherlocs %>%
+  mutate(
+    tot_dwellings_chr = formatC(total_dwellings, format = "d", big.mark = ",")
+  ) %>%
+  arrange(hscp_locality) %>%
+  select(hscp_locality, tot_dwellings_chr) %>%
+  pivot_wider(names_from = hscp_locality, values_from = tot_dwellings_chr)
+
+other_locs_perc_discount <- house_dat_otherlocs %>%
+  select(hscp_locality, tax_discount_perc) %>%
+  arrange(hscp_locality) %>%
+  pivot_wider(names_from = hscp_locality, values_from = tax_discount_perc)
+
+
+house_dat2_otherlocs <- house_raw_dat2 %>%
+  inner_join(other_locs_dz, by = c("data_zone_code" = "datazone2011")) %>%
+  group_by(hscp_locality) %>%
+  summarise(
+    total_number_of_dwellings = sum(total_number_of_dwellings),
+    band_a = sum(council_tax_band_a),
+    band_b = sum(council_tax_band_b),
+    band_c = sum(council_tax_band_c),
+    band_f = sum(council_tax_band_f),
+    band_g = sum(council_tax_band_g),
+    band_h = sum(council_tax_band_h)
+  ) %>%
+  mutate(
+    perc_houses_AC = round_half_up(
+      (band_a + band_b + band_c) / total_number_of_dwellings * 100,
+      1
+    ),
+    perc_houses_FH = round_half_up(
+      (band_f + band_g + band_h) / total_number_of_dwellings * 100,
+      1
+    )
+  )
+
+other_locs_perc_housesAC <- house_dat2_otherlocs %>%
+  arrange(hscp_locality) %>%
+  select(hscp_locality, perc_houses_AC) %>%
+  pivot_wider(names_from = hscp_locality, values_from = perc_houses_AC)
+
+other_locs_perc_housesFH <- house_dat2_otherlocs %>%
+  arrange(hscp_locality) %>%
+  select(hscp_locality, perc_houses_FH) %>%
+  pivot_wider(names_from = hscp_locality, values_from = perc_houses_FH)
+
+rm(house_dat2_otherlocs, house_dat_otherlocs, other_locs_dz)
+
+
+# 2. HSCP
 
 # Global Script Function to read in Localities Lookup
 hscp_dz <- read_in_localities(dz_level = TRUE) %>%

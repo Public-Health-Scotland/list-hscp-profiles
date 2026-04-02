@@ -327,6 +327,165 @@ clean_scotpho_dat <- function(data) {
     )
 }
 
+## Time trend function for ScotPHO data ----
+
+# Creates a time trend for chosen locality, HSCP, HB and Scotland with confidence interval ribbons
+# Data must first be cleaned using clean_scotpho_dat function
+# Uses variable "period_short" which must be created - this is a shortened version of the "period" column in ScotPHO data
+# ex: mutate(period_short = gsub("to", "-", substr(period, 1, 12)))
+# Uses objects "LOCALITY", "HSCP" and "HB" to filter - these must be specified earlier in script
+
+# Arguments:
+# data: data to use for chart
+# chart_title, xaxis_title, yaxis_title : titles for chart, x axis and y axis
+# string_wrap: number of characters after which to "wrap" the x axis labels
+# (ScotPHO data uses year aggregates which don't always fit on axis unless wrapped)
+# rotate_xaxis: default F, if labels still don't fit even with wrapping (prev argument), labels can be rotated
+
+scotpho_time_trend <- function(
+  data,
+  chart_title,
+  xaxis_title,
+  yaxis_title,
+  string_wrap,
+  rotate_xaxis = FALSE,
+  trend_years = 10
+) {
+  # rotate axis criteria if T/F
+  if (rotate_xaxis) {
+    rotation <- element_text(angle = 45, hjust = 1)
+  } else {
+    rotation <- element_text(angle = 0)
+  }
+
+  # filter and reorder data
+  data %>%
+    filter(
+      (area_name == LOCALITY & area_type == "Locality") |
+        (area_name == HSCP & area_type == "HSCP") |
+        area_name == HB |
+        area_name == "Scotland"
+    ) %>%
+    filter(year >= max(year) - trend_years) %>%
+    mutate(
+      area_type = factor(
+        area_type,
+        levels = c("Locality", "HSCP", "Health board", "Scotland")
+      ),
+      area_name = fct_reorder(
+        as.factor(str_wrap(area_name, 23)),
+        as.numeric(area_type)
+      )
+    ) %>%
+    # plot
+    ggplot(aes(
+      x = str_wrap(period_short, width = string_wrap),
+      y = measure,
+      group = area_name,
+      fill = area_name,
+      linetype = area_type
+    )) +
+    geom_line(aes(colour = area_name), linewidth = 1) +
+    geom_point(aes(colour = area_name), size = 2) +
+    geom_ribbon(
+      aes(
+        x = str_wrap(period_short, width = string_wrap),
+        ymin = lower_confidence_interval,
+        ymax = upper_confidence_interval
+      ),
+      alpha = 0.1
+    ) +
+    scale_fill_manual(values = palette) +
+    scale_colour_manual(values = palette) +
+    scale_y_continuous(labels = scales::comma) +
+    theme_profiles() +
+    expand_limits(y = 0) +
+    labs(
+      title = chart_title,
+      x = xaxis_title,
+      y = yaxis_title,
+      caption = "Source: ScotPHO"
+    ) +
+    theme(axis.text.x = rotation) +
+    guides(
+      linetype = "none",
+      shape = "none",
+      fill = "none",
+      colour = guide_legend(nrow = 1, byrow = TRUE)
+    )
+}
+
+
+scotpho_time_trend_HSCP <- function(
+  data,
+  chart_title,
+  xaxis_title,
+  yaxis_title,
+  string_wrap,
+  rotate_xaxis = FALSE
+) {
+  # rotate axis criteria if T/F
+  if (rotate_xaxis) {
+    rotation <- element_text(angle = 45, hjust = 1)
+  } else {
+    rotation <- element_text(angle = 0)
+  }
+
+  # filter and reorder data
+  data %>%
+    filter(
+      (area_name == HSCP & area_type == "HSCP") |
+        area_name == HB |
+        area_name == "Scotland"
+    ) %>%
+    filter(year >= max(year) - 10) %>%
+    mutate(
+      area_type = factor(
+        area_type,
+        levels = c("HSCP", "Health board", "Scotland")
+      ),
+      area_name = fct_reorder(
+        as.factor(str_wrap(area_name, 23)),
+        as.numeric(area_type)
+      )
+    ) %>%
+    # plot
+    ggplot(aes(
+      x = str_wrap(period_short, width = string_wrap),
+      y = measure,
+      group = area_name,
+      fill = area_name,
+      linetype = area_type
+    )) +
+    geom_line(aes(colour = area_name), linewidth = 1) +
+    geom_point(aes(colour = area_name), size = 2) +
+    geom_ribbon(
+      aes(
+        x = str_wrap(period_short, width = string_wrap),
+        ymin = lower_confidence_interval,
+        ymax = upper_confidence_interval
+      ),
+      alpha = 0.1
+    ) +
+    scale_fill_manual(values = palette) +
+    scale_colour_manual(values = palette) +
+    theme_profiles() +
+    expand_limits(y = 0) +
+    labs(
+      title = chart_title,
+      x = xaxis_title,
+      y = yaxis_title,
+      caption = "Source: ScotPHO"
+    ) +
+    theme(axis.text.x = rotation) +
+    guides(
+      linetype = "none",
+      shape = "none",
+      fill = "none",
+      colour = guide_legend(nrow = 1, byrow = TRUE)
+    )
+}
+
 ## Bar chart function for ScotPHO data ----
 
 # Creates a horizontal bar chart comparing the last time period of data across
@@ -338,6 +497,52 @@ clean_scotpho_dat <- function(data) {
 # Arguments:
 # data: data to use for chart
 # chart_title, xaxis_title : titles for chart and x axis
+
+scotpho_bar_chart <- function(data, chart_title, xaxis_title) {
+  data_for_plot <- data %>%
+    filter(year == max(year)) %>%
+    filter(
+      (area_name %in%
+        c(LOCALITY, other_locs$hscp_locality) &
+        area_type == "Locality") |
+        (area_name == HSCP & area_type == "HSCP") |
+        area_name == HB |
+        area_name == "Scotland"
+    ) %>%
+    mutate(
+      text_highlight = area_name == LOCALITY,
+      area_type = factor(
+        area_type,
+        levels = c("Locality", "HSCP", "Health board", "Scotland")
+      ),
+      area_name = fct_reorder(as.factor(str_wrap(area_name, 28)), measure)
+    ) %>%
+    arrange(area_name)
+
+  ggplot(data_for_plot) +
+    aes(y = area_name, fill = area_type, weight = measure) +
+    geom_bar(colour = "white") +
+    scale_fill_manual(values = palette) +
+    theme_profiles() +
+    theme(
+      axis.text.y = element_text(
+        colour = if_else(data_for_plot$text_highlight, "red", "black"),
+        face = if_else(data_for_plot$text_highlight, "bold", "plain")
+      )
+    ) +
+    labs(
+      title = chart_title,
+      x = xaxis_title,
+      y = " ",
+      fill = " ",
+      caption = "Source: ScotPHO"
+    ) +
+    geom_errorbar(
+      aes(xmin = lower_confidence_interval, xmax = upper_confidence_interval),
+      width = 0.2,
+      position = position_dodge(width = 1)
+    )
+}
 
 
 scotpho_bar_chart_HSCP <- function(data, chart_title, xaxis_title) {
@@ -388,9 +593,13 @@ check_missing_data_scotpho <- function(data) {
   data |>
     filter(area_type == "HSCP") |>
     filter(year == max(year)) |>
-    right_join(read_in_localities(), by = c("area_name" = "hscp2019name")) |>
+    right_join(
+      read_in_localities(),
+      by = c("area_name" = "hscp2019name"),
+      multiple = "any"
+    ) |>
     filter(is.na(indicator)) |>
-    select(area_name, hscp2019name)
+    select(area_name)
 }
 
 
@@ -513,11 +722,12 @@ lp_flextable_theme <- function(ft) {
 }
 
 add_cover_page <- function(
-    document_path,
-    cover_page_path,
-    main_title,
-    date = format(Sys.Date(), "%d/%m/%Y"),
-    subtitle = "") {
+  document_path,
+  cover_page_path,
+  main_title,
+  date = format(Sys.Date(), "%d/%m/%Y"),
+  subtitle = ""
+) {
   # Load and update cover page
   cover_page <- cover_page_path |>
     officer::read_docx() |>
