@@ -1,7 +1,7 @@
 # This script iterates through HSCPs and their localities.
 # For each locality, it processes and extracts data related for:
 #   - Unscheduled Care
-#   - General Health
+#   - Population Health
 #
 # The script identifying instances where counts are less than 10
 # The processed data is then saved to separate Excel files for each HSCP,
@@ -136,7 +136,7 @@ for (HSCP in hscp_list) {
   gc() # Run garbage collection to further free up memory
 
   # **Population Health Data Processing** ----
-  # Extract and filter general health data for the current locality
+  # Extract and filter Population health data for the current HSCP
   source("Population Health/3. Population Health Outputs.R")
 
   stopifnot(

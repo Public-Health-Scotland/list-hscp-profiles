@@ -223,15 +223,15 @@ alcohol_hosp_bar
 
 alcohol_hosp_latest <- filter(
   alcohol_hosp,
-  year == max(alcohol_hosp$year) &
-    (area_name == HSCP & area_type == "HSCP")
-)$measure
+  year == max(alcohol_hosp[["year"]]),
+  (area_name == HSCP & area_type == "HSCP")
+)[["measure"]]
 
 alcohol_hosp_earliest <- filter(
   alcohol_hosp,
-  (year == min(alcohol_hosp$year)) &
-    (area_name == HSCP & area_type == "HSCP")
-)$measure
+  (year == min(alcohol_hosp[["year"]])),
+  (area_name == HSCP & area_type == "HSCP")
+)[["measure"]]
 
 alcohol_hosp_change <- abs(
   (alcohol_hosp_latest - alcohol_hosp_earliest) / alcohol_hosp_earliest * 100
@@ -244,8 +244,9 @@ alcohol_hosp_change_word <- if_else(
 
 scot_alcohol_hosp <- filter(
   alcohol_hosp,
-  year == max(alcohol_hosp$year) & area_name == "Scotland"
-)$measure
+  year == max(alcohol_hosp[["year"]]),
+  area_name == "Scotland"
+)[["measure"]]
 
 alcohol_hosp_diff_scot <- if_else(
   alcohol_hosp_latest > scot_alcohol_hosp,
@@ -293,14 +294,14 @@ alcohol_deaths_bar
 
 alcohol_deaths_latest <- filter(
   alcohol_deaths,
-  year == max(alcohol_deaths$year) &
-    (area_name == HSCP & area_type == "HSCP")
+  year == max(alcohol_deaths$year),
+  (area_name == HSCP & area_type == "HSCP")
 )$measure
 
 alcohol_deaths_earliest <- filter(
   alcohol_deaths,
-  (year == min(alcohol_deaths$year)) &
-    (area_name == HSCP & area_type == "HSCP")
+  (year == min(alcohol_deaths$year)),
+  (area_name == HSCP & area_type == "HSCP")
 )$measure
 
 alcohol_deaths_change <- abs(
@@ -316,7 +317,8 @@ alcohol_deaths_change_word <- if_else(
 
 scot_alcohol_deaths <- filter(
   alcohol_deaths,
-  year == max(alcohol_deaths$year) & area_name == "Scotland"
+  year == max(alcohol_deaths$year),
+  area_name == "Scotland"
 )$measure
 
 alcohol_deaths_diff_scot <- if_else(
@@ -365,14 +367,14 @@ bowel_screening_bar
 
 bowel_screening_latest <- filter(
   bowel_screening,
-  year == max(bowel_screening$year) &
-    (area_name == HSCP & area_type == "HSCP")
+  year == max(bowel_screening$year),
+  (area_name == HSCP & area_type == "HSCP")
 )$measure
 
 bowel_screening_earliest <- filter(
   bowel_screening,
-  (year == min(bowel_screening$year)) &
-    (area_name == HSCP & area_type == "HSCP")
+  (year == min(bowel_screening$year)),
+  (area_name == HSCP & area_type == "HSCP")
 )$measure
 
 bowel_screening_change <- abs(
@@ -389,7 +391,8 @@ bowel_screening_change_word <- if_else(
 
 scot_bowel_screening <- filter(
   bowel_screening,
-  year == max(bowel_screening$year) & area_name == "Scotland"
+  year == max(bowel_screening$year),
+  area_name == "Scotland"
 )$measure
 
 bowel_screening_diff_scot <- if_else(
@@ -445,8 +448,8 @@ other_locs_bowel_screening <- other_locs_summary_table(
 hscp_drug_hosp <- round_half_up(
   filter(
     drug_hosp,
-    year == max(year) &
-      (area_name == HSCP & area_type == "HSCP")
+    year == max(year),
+    (area_name == HSCP & area_type == "HSCP")
   )$measure,
   1
 )
@@ -454,8 +457,8 @@ hscp_drug_hosp <- round_half_up(
 hscp_alcohol_hosp <- round_half_up(
   filter(
     alcohol_hosp,
-    year == max(year) &
-      (area_name == HSCP & area_type == "HSCP")
+    year == max(year),
+    (area_name == HSCP & area_type == "HSCP")
   )$measure,
   1
 )
@@ -463,8 +466,8 @@ hscp_alcohol_hosp <- round_half_up(
 hscp_alcohol_deaths <- round_half_up(
   filter(
     alcohol_deaths,
-    year == max(year) &
-      (area_name == HSCP & area_type == "HSCP")
+    year == max(year),
+    (area_name == HSCP & area_type == "HSCP")
   )$measure,
   1
 )
@@ -472,8 +475,8 @@ hscp_alcohol_deaths <- round_half_up(
 hscp_bowel_screening <- round_half_up(
   filter(
     bowel_screening,
-    year == max(year) &
-      (area_name == HSCP & area_type == "HSCP")
+    year == max(year),
+    (area_name == HSCP & area_type == "HSCP")
   )$measure,
   1
 )
