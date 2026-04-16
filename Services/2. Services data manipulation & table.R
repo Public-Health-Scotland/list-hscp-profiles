@@ -38,7 +38,6 @@ lookup2 <- read_in_localities()
 n_loc <- count_localities(lookup2, HSCP)
 
 
-
 # Get number of localities in HSCP
 n_loc <- count_localities(read_in_localities(), HSCP)
 
