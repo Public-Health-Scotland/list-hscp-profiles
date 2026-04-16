@@ -500,9 +500,11 @@ other_loc_emergency_adm <- emergency_adm %>%
     pops_other_locs,
     by = join_by(financial_year, hscp_locality)
   ) %>%
-  mutate(adm = replace_na(adm, 0)) %>%
-  mutate(data = round_half_up(adm / pop * 100000)) %>%
-  mutate(data = format(data, big.mark = ",")) %>%
+  mutate(
+    adm = replace_na(adm, 0),
+    data = round_half_up(adm / pop * 100000),
+    data = format(data, big.mark = ",")
+  ) %>%
   select(hscp_locality, data) %>%
   pivot_wider(names_from = hscp_locality, values_from = data)
 
@@ -611,14 +613,16 @@ max_year_ubd <- max(bed_days_areas$financial_year)
 first_fy_rate_ubd <- filter(
   bed_days_areas,
   financial_year == min(financial_year),
-  location == HSCP & area_type == "HSCP"
+  location == HSCP,
+  area_type == "HSCP"
 )$data
 
 
 # HSCP
 first_fy_hscp_ubd <- filter(
   bed_days_areas,
-  (financial_year == min(bed_days_areas$financial_year)) & (area_type == "HSCP")
+  (financial_year == min(bed_days_areas$financial_year)),
+  (area_type == "HSCP")
 )$data
 
 hscp_bed_days <- bed_days_areas %>%
@@ -634,8 +638,8 @@ hscp_change_ubd <- word_change_calc(hscp_bed_days2, first_fy_hscp_ubd)
 # Scotland
 first_fy_scot_ubd <- filter(
   bed_days_areas,
-  (financial_year == min(bed_days_areas$financial_year)) &
-    (area_type == "Scotland")
+  (financial_year == min(bed_days_areas$financial_year)),
+  (area_type == "Scotland")
 )$data
 
 scot_bed_days <- bed_days_areas %>%
@@ -673,9 +677,11 @@ other_loc_bed_days <- bed_days %>%
   summarise(bed_days = sum(bed_days)) %>%
   ungroup() %>%
   right_join(pops_other_locs, by = join_by(financial_year, hscp_locality)) %>%
-  mutate(adm = replace_na(bed_days, 0)) %>%
-  mutate(data = round_half_up(bed_days / pop * 100000)) %>%
-  mutate(data = format(data, big.mark = ",")) %>%
+  mutate(
+    adm = replace_na(bed_days, 0),
+    data = round_half_up(bed_days / pop * 100000),
+    data = format(data, big.mark = ",")
+  ) %>%
   select(hscp_locality, data) %>%
   pivot_wider(names_from = hscp_locality, values_from = data)
 
@@ -936,9 +942,11 @@ other_loc_bed_days_mh <- bed_days_mh %>%
   summarise(bed_days = sum(bed_days)) %>%
   ungroup() %>%
   right_join(pops_other_locs, by = join_by(financial_year, hscp_locality)) %>%
-  mutate(adm = replace_na(bed_days, 0)) %>%
-  mutate(data = round_half_up(bed_days / pop * 100000)) %>%
-  mutate(data = format(data, big.mark = ",")) %>%
+  mutate(
+    adm = replace_na(bed_days, 0),
+    data = round_half_up(bed_days / pop * 100000),
+    data = format(data, big.mark = ",")
+  ) %>%
   select(hscp_locality, data) %>%
   pivot_wider(names_from = hscp_locality, values_from = data)
 
@@ -1142,9 +1150,11 @@ other_loc_ae_att <- ae_attendances %>%
   summarise(attendances = sum(attendances)) %>%
   ungroup() %>%
   right_join(pops_other_locs, by = join_by(financial_year, hscp_locality)) %>%
-  mutate(attendances = replace_na(attendances, 0)) %>%
-  mutate(data = round_half_up(attendances / pop * 100000)) %>%
-  mutate(data = format(data, big.mark = ",")) %>%
+  mutate(
+    attendances = replace_na(attendances, 0),
+    data = round_half_up(attendances / pop * 100000),
+    data = format(data, big.mark = ",")
+  ) %>%
   select(hscp_locality, data) %>%
   pivot_wider(names_from = hscp_locality, values_from = data)
 
@@ -1259,9 +1269,11 @@ other_loc_dd <- delayed_disch %>%
     pops_other_locs_65plus,
     by = join_by(financial_year, hscp_locality)
   ) %>%
-  mutate(dd_bed_days = replace_na(dd_bed_days, 0)) %>%
-  mutate(data = round_half_up(dd_bed_days / pop * 100000)) %>%
-  mutate(data = format(data, big.mark = ",")) %>%
+  mutate(
+    dd_bed_days = replace_na(dd_bed_days, 0),
+    data = round_half_up(dd_bed_days / pop * 100000),
+    data = format(data, big.mark = ",")
+  ) %>%
   select(hscp_locality, data) %>%
   pivot_wider(names_from = hscp_locality, values_from = data)
 
@@ -1697,7 +1709,12 @@ ppa_areas <- ppa %>%
   rename(n = admissions) %>%
   aggregate_usc_area_data() %>%
   left_join(pop_areas_all_ages, by = join_by(financial_year, location)) %>%
-  mutate(data = round_half_up(n / pop * 100000))
+  mutate(
+    data = round_half_up(n / pop * 100000),
+    location = factor(location, levels = c(HSCP, HB, "Scotland"))
+  ) %>%
+  arrange(location) %>%
+  drop_na(year)
 
 
 ppa_loc_ts <- area_trend_usc(
@@ -1767,9 +1784,11 @@ other_loc_ppa <- ppa %>%
   summarise(admissions = sum(admissions)) %>%
   ungroup() %>%
   right_join(pops_other_locs, by = join_by(financial_year, hscp_locality)) %>%
-  mutate(admissions = replace_na(admissions, 0)) %>%
-  mutate(data = round_half_up(admissions / pop * 100000)) %>%
-  mutate(data = format(data, big.mark = ",")) %>%
+  mutate(
+    admissions = replace_na(admissions, 0),
+    data = round_half_up(admissions / pop * 100000),
+    data = format(data, big.mark = ",")
+  ) %>%
   select(hscp_locality, data) %>%
   pivot_wider(names_from = hscp_locality, values_from = data)
 
@@ -1809,8 +1828,8 @@ psych_hosp_time_trend <- psych_hosp %>%
 psych_hosp_latest <- round_half_up(
   filter(
     psych_hosp,
-    year == max(psych_hosp$year) &
-      (area_name == HSCP & area_type == "HSCP")
+    year == max(psych_hosp$year),
+    (area_name == HSCP & area_type == "HSCP")
   )$measure,
   1
 )
@@ -1828,13 +1847,14 @@ other_locs_psych_hosp <- psych_hosp %>%
 hscp_psych_hosp <- round_half_up(
   filter(
     psych_hosp,
-    year == max(year) & (area_name == HSCP & area_type == "HSCP")
+    year == max(year),
+    (area_name == HSCP & area_type == "HSCP")
   )$measure,
   1
 )
 
 scot_psych_hosp <- round_half_up(
-  filter(psych_hosp, year == max(year) & area_name == "Scotland")$measure,
+  filter(psych_hosp, year == max(year), area_name == "Scotland")$measure,
   1
 )
 
@@ -1866,8 +1886,8 @@ word_change_loc_psych <- word_change_calc(
 hscp_psych_hosp <- psych_hosp %>%
   filter(period %in% list_years_latest) %>%
   filter(
-    area_name == HSCP &
-      area_type == "HSCP",
+    area_name == HSCP,
+    area_type == "HSCP",
     year == min(year) | year == max(year)
   ) %>%
   mutate(measure2 = format(measure, big.mark = ","))
@@ -1885,8 +1905,8 @@ word_change_hscp_psych <- word_change_calc(
 hb_psych_hosp <- psych_hosp %>%
   filter(period %in% list_years_latest) %>%
   filter(
-    area_name == HB &
-      area_type == "Health board",
+    area_name == HB,
+    area_type == "Health board",
     year == min(year) | year == max(year)
   ) %>%
   mutate(measure2 = format(measure, big.mark = ","))
@@ -1904,8 +1924,8 @@ word_change_hb_psych <- word_change_calc(
 scot_psych_hosp <- psych_hosp %>%
   filter(period %in% list_years_latest) %>%
   filter(
-    area_name == "Scotland" &
-      area_type == "Scotland",
+    area_name == "Scotland",
+    area_type == "Scotland",
     year == min(year) | year == max(year)
   ) %>%
   mutate(measure2 = format(measure, big.mark = ","))
