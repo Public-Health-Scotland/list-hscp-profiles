@@ -1,7 +1,7 @@
 # LOCALITY PROFILES SERVICES MAP & TABLE CODE
 # Code for creating the HSCP services map for the locality profiles
 
-# 0. Testing Set up ----
+# 0. Testing Set up ---
 
 ## Select HCSP (for testing only)
 #HSCP <- "Aberdeenshire"
