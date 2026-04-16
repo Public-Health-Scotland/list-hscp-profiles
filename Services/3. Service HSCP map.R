@@ -170,12 +170,11 @@ service_map <- ggmap(service_map_background) +
     data = shp_hscp,
     aes(fill = hscp_local),
     colour = "white",
-    linewidth = 0.3,  
+    linewidth = 0.3,
     alpha = 0.4,
     inherit.aes = FALSE
-  )+
+  ) +
   labs(fill = "Locality")
-
 
 
 # check if services markers exist for locality
