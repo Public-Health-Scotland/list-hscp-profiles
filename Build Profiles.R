@@ -77,17 +77,17 @@ for (HSCP in hscp_list) {
   doc_title <- glue(safe_hscp, "- HSCP Profile")
   output_doc_name <- path_ext_set(doc_title, "docx")
 
-    # Make sure your working directory is the project root
-    bookdown::render_book(
-      input = "lp_bookdown",
-      output_dir = output_dir,
-      output_file = output_doc_name,
-      new_session = FALSE,
-      output_format = "bookdown::word_document2",
-      config_file = "_bookdown.yaml"
-    )
+  # Make sure your working directory is the project root
+  bookdown::render_book(
+    input = "lp_bookdown",
+    output_dir = output_dir,
+    output_file = output_doc_name,
+    new_session = FALSE,
+    output_format = "bookdown::word_document2",
+    config_file = "_bookdown.yaml"
+  )
 
-    # safe version for file paths
+  # safe version for file paths
 
   document_path <- path(output_dir, output_doc_name)
 
