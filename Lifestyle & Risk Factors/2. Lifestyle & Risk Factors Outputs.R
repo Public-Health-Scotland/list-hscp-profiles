@@ -25,6 +25,9 @@ ext_year <- 2025
 # Source in functions code
 # source("Master RMarkdown Document & Render Code/Global Script.R")
 
+# ScotPHO time trend will only be latest 10 years
+trend_years <- 10
+
 ### Geographical lookups and objects ----
 
 # Locality lookup
@@ -102,20 +105,25 @@ check_missing_data_scotpho(bowel_screening)
 ##### 2a Drug-related hospital admissions #####
 
 ## Create variables for latest year
-max_year_drug_hosp <- max(drug_hosp[["year"]])
-min_year_drug_hosp <- min(drug_hosp[["year"]])
-latest_period_drug_hosp <- drug_hosp[["period_short"]][which.max(drug_hosp[[
-  "year"
-]])]
-earliest_period_drug_hosp <- drug_hosp[["period_short"]][which.min(drug_hosp[[
-  "year"
-]])]
-# ScotPHO time trend will only be latest 10 years
-trend_years <- 10
-earliest_period_drug_hosp_trend <- drug_hosp[["period_short"]][match(
-  max_year_drug_hosp - trend_years,
-  drug_hosp[["year"]]
-)]
+
+max_year_drug_hosp <- drug_hosp %>%
+  pull(year) %>%
+  max()
+
+min_year_drug_hosp <- drug_hosp %>%
+  pull(year) %>%
+  min() %>%
+  max(., max_year_drug_hosp - trend_years)
+
+latest_period_drug_hosp <- drug_hosp %>%
+  filter(year == max_year_drug_hosp) %>%
+  pull(period_short) %>%
+  unique()
+
+earliest_period_drug_hosp <- drug_hosp %>%
+  filter(year == min_year_drug_hosp) %>%
+  pull(period_short) %>%
+  unique()
 
 
 ## Time trend
@@ -185,13 +193,24 @@ drug_hosp_diff_scot <- if_else(
 ##### 2b Alcohol-related hospital admissions #####
 
 ## Create variables for latest year
-latest_period_alcohol_hosp <- unique(
-  filter(alcohol_hosp, year == max(alcohol_hosp$year))$period_short
-)
-earliest_period_alcohol_hosp <- unique(
-  filter(alcohol_hosp, year == min(alcohol_hosp$year))$period_short
-)
+max_year_alcohol_hosp <- alcohol_hosp %>%
+  pull(year) %>%
+  max()
 
+min_year_alcohol_hosp <- alcohol_hosp %>%
+  pull(year) %>%
+  min() %>%
+  max(., max_year_alcohol_hosp - trend_years)
+
+latest_period_alcohol_hosp <- alcohol_hosp %>%
+  filter(year == max_year_alcohol_hosp) %>%
+  pull(period_short) %>%
+  unique()
+
+earliest_period_alcohol_hosp <- alcohol_hosp %>%
+  filter(year == min_year_alcohol_hosp) %>%
+  pull(period_short) %>%
+  unique()
 
 ## Time trend
 alcohol_hosp_time_trend <- scotpho_time_trend_HSCP(
@@ -223,15 +242,15 @@ alcohol_hosp_bar
 
 alcohol_hosp_latest <- filter(
   alcohol_hosp,
-  year == max(alcohol_hosp[["year"]]),
+  year == max_year_alcohol_hosp &
   (area_name == HSCP & area_type == "HSCP")
-)[["measure"]]
+)$measure
 
 alcohol_hosp_earliest <- filter(
   alcohol_hosp,
-  (year == min(alcohol_hosp[["year"]])),
+  (year == min_year_alcohol_hosp) &
   (area_name == HSCP & area_type == "HSCP")
-)[["measure"]]
+)$measure
 
 alcohol_hosp_change <- abs(
   (alcohol_hosp_latest - alcohol_hosp_earliest) / alcohol_hosp_earliest * 100
@@ -244,9 +263,8 @@ alcohol_hosp_change_word <- if_else(
 
 scot_alcohol_hosp <- filter(
   alcohol_hosp,
-  year == max(alcohol_hosp[["year"]]),
-  area_name == "Scotland"
-)[["measure"]]
+  year == max_year_alcohol_hosp & area_name == "Scotland"
+)$measure
 
 alcohol_hosp_diff_scot <- if_else(
   alcohol_hosp_latest > scot_alcohol_hosp,
@@ -258,12 +276,24 @@ alcohol_hosp_diff_scot <- if_else(
 ##### 2c Alcohol specific deaths #####
 
 ## Create variables for latest year
-latest_period_alcohol_deaths <- unique(
-  filter(alcohol_deaths, year == max(alcohol_deaths$year))$period_short
-)
-earliest_period_alcohol_deaths <- unique(
-  filter(alcohol_deaths, year == min(alcohol_deaths$year))$period_short
-)
+max_year_alcohol_deaths <- alcohol_deaths %>%
+  pull(year) %>%
+  max()
+
+min_year_alcohol_deaths <- alcohol_deaths %>%
+  pull(year) %>%
+  min() %>%
+  max(., max_year_alcohol_deaths - trend_years)
+
+latest_period_alcohol_deaths <- alcohol_deaths %>%
+  filter(year == max_year_alcohol_deaths) %>%
+  pull(period_short) %>%
+  unique()
+
+earliest_period_alcohol_deaths <- alcohol_deaths %>%
+  filter(year == min_year_alcohol_deaths) %>%
+  pull(period_short) %>%
+  unique()
 
 
 ## Time trend
@@ -294,13 +324,13 @@ alcohol_deaths_bar
 
 alcohol_deaths_latest <- filter(
   alcohol_deaths,
-  year == max(alcohol_deaths$year),
+  year == max_year_alcohol_deaths &
   (area_name == HSCP & area_type == "HSCP")
 )$measure
 
 alcohol_deaths_earliest <- filter(
   alcohol_deaths,
-  (year == min(alcohol_deaths$year)),
+  (year == min_year_alcohol_deaths) &
   (area_name == HSCP & area_type == "HSCP")
 )$measure
 
@@ -317,8 +347,7 @@ alcohol_deaths_change_word <- if_else(
 
 scot_alcohol_deaths <- filter(
   alcohol_deaths,
-  year == max(alcohol_deaths$year),
-  area_name == "Scotland"
+  year == max_year_alcohol_deaths & area_name == "Scotland"
 )$measure
 
 alcohol_deaths_diff_scot <- if_else(
@@ -331,13 +360,24 @@ alcohol_deaths_diff_scot <- if_else(
 ##### 2d Bowel Screening Uptake #####
 
 ## Create variables for latest year
-latest_period_bowel_screening <- unique(
-  filter(bowel_screening, year == max(bowel_screening$year))$period_short
-)
-earliest_period_bowel_screening <- unique(
-  filter(bowel_screening, year == min(bowel_screening$year))$period_short
-)
+max_year_bowel_screening <- bowel_screening %>%
+  pull(year) %>%
+  max()
 
+min_year_bowel_screening <- bowel_screening %>%
+  pull(year) %>%
+  min() %>%
+  max(., max_year_bowel_screening - trend_years)
+
+latest_period_bowel_screening <- bowel_screening %>%
+  filter(year == max_year_bowel_screening) %>%
+  pull(period_short) %>%
+  unique()
+
+earliest_period_bowel_screening <- bowel_screening %>%
+  filter(year == min_year_bowel_screening) %>%
+  pull(period_short) %>%
+  unique()
 
 ## Time trend
 bowel_screening_time_trend <- scotpho_time_trend_HSCP(
@@ -367,13 +407,13 @@ bowel_screening_bar
 
 bowel_screening_latest <- filter(
   bowel_screening,
-  year == max(bowel_screening$year),
+  year == max_year_bowel_screening &
   (area_name == HSCP & area_type == "HSCP")
 )$measure
 
 bowel_screening_earliest <- filter(
   bowel_screening,
-  (year == min(bowel_screening$year)),
+  (year == min_year_bowel_screening) &
   (area_name == HSCP & area_type == "HSCP")
 )$measure
 
@@ -391,8 +431,7 @@ bowel_screening_change_word <- if_else(
 
 scot_bowel_screening <- filter(
   bowel_screening,
-  year == max(bowel_screening$year),
-  area_name == "Scotland"
+  year == max_year_bowel_screening & area_name == "Scotland"
 )$measure
 
 bowel_screening_diff_scot <- if_else(
