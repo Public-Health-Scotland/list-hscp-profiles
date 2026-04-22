@@ -243,13 +243,13 @@ alcohol_hosp_bar
 alcohol_hosp_latest <- filter(
   alcohol_hosp,
   year == max_year_alcohol_hosp &
-  (area_name == HSCP & area_type == "HSCP")
+    (area_name == HSCP & area_type == "HSCP")
 )$measure
 
 alcohol_hosp_earliest <- filter(
   alcohol_hosp,
   (year == min_year_alcohol_hosp) &
-  (area_name == HSCP & area_type == "HSCP")
+    (area_name == HSCP & area_type == "HSCP")
 )$measure
 
 alcohol_hosp_change <- abs(
@@ -325,13 +325,13 @@ alcohol_deaths_bar
 alcohol_deaths_latest <- filter(
   alcohol_deaths,
   year == max_year_alcohol_deaths &
-  (area_name == HSCP & area_type == "HSCP")
+    (area_name == HSCP & area_type == "HSCP")
 )$measure
 
 alcohol_deaths_earliest <- filter(
   alcohol_deaths,
   (year == min_year_alcohol_deaths) &
-  (area_name == HSCP & area_type == "HSCP")
+    (area_name == HSCP & area_type == "HSCP")
 )$measure
 
 alcohol_deaths_change <- abs(
@@ -408,13 +408,13 @@ bowel_screening_bar
 bowel_screening_latest <- filter(
   bowel_screening,
   year == max_year_bowel_screening &
-  (area_name == HSCP & area_type == "HSCP")
+    (area_name == HSCP & area_type == "HSCP")
 )$measure
 
 bowel_screening_earliest <- filter(
   bowel_screening,
   (year == min_year_bowel_screening) &
-  (area_name == HSCP & area_type == "HSCP")
+    (area_name == HSCP & area_type == "HSCP")
 )$measure
 
 bowel_screening_change <- abs(
