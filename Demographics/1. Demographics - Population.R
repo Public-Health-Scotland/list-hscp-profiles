@@ -198,7 +198,10 @@ pop_pyramid <- ggplot(
   labs(
     x = "Population",
     y = "Age Group",
-    title = paste0(str_wrap(`HSCP`, 50), " population pyramid ", pop_max_year)
+    title = str_wrap(
+      glue("{HSCP} population pyramid {pop_max_year}"),
+      width = 50
+    )
   )
 
 # Population Structure Changes
