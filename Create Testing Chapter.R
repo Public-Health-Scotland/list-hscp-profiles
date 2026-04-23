@@ -12,7 +12,7 @@ source("Master RMarkdown Document & Render Code/Global Script.R")
 # Enter Rmarkdown file of Chapter(s) You Wish To Test
 # More than 1 can be entered at a time (c() format)
 
-chapter_oi <- c("Services.Rmd")
+chapter_oi <- c("Demographics.Rmd")
 HSCP <- "Aberdeen City"
 
 # Output Directory
