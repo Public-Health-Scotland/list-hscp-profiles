@@ -95,48 +95,48 @@ for (HSCP in hscp_list) {
   # Appendices ----
   source("Master RMarkdown Document & Render Code/Tables for Appendix.R")
 
-	safe_hscp <- gsub("[/\\\\]", "-", HSCP)
-	main_title <- glue(safe_hscp, " - HSCP Profile")
-	output_doc_name <- path_ext_set(main_title, "docx")
+  safe_hscp <- gsub("[/\\\\]", "-", HSCP)
+  main_title <- glue(safe_hscp, " - HSCP Profile")
+  output_doc_name <- path_ext_set(main_title, "docx")
 
-	tmp_document_path <- path(tmp_docs_dir, output_doc_name)
-	final_document_path <- path(output_dir, output_doc_name)
+  tmp_document_path <- path(tmp_docs_dir, output_doc_name)
+  final_document_path <- path(output_dir, output_doc_name)
 
-	bookdown::render_book(
-	  input = local_lp_bookdown,
-	  output_dir = tmp_docs_dir,
-	  output_file = output_doc_name,
-	  new_session = FALSE,
-	  output_format = "bookdown::word_document2",
-	  config_file = "_bookdown.yaml"
-	)
+  bookdown::render_book(
+    input = local_lp_bookdown,
+    output_dir = tmp_docs_dir,
+    output_file = output_doc_name,
+    new_session = FALSE,
+    output_format = "bookdown::word_document2",
+    config_file = "_bookdown.yaml"
+  )
 
-	orient(tmp_document_path)
+  orient(tmp_document_path)
 
-	add_cover_page(
-	  tmp_document_path,
-	  tmp_cover_page_path,
-	  main_title
-	)
+  add_cover_page(
+    tmp_document_path,
+    tmp_cover_page_path,
+    main_title
+  )
 
-	apply_sensitivity_label(
-	  tmp_document_path,
-	  "OFFICIAL_SENSITIVE_VMO"
-	)
+  apply_sensitivity_label(
+    tmp_document_path,
+    "OFFICIAL_SENSITIVE_VMO"
+  )
 
-	if (file_exists(final_document_path)) {
-	  file_delete(final_document_path)
-	}
+  if (file_exists(final_document_path)) {
+    file_delete(final_document_path)
+  }
 
-	file_move(
-	  tmp_document_path,
-	  final_document_path
-	)
-	# End of loop housekeeping ----
-	# Clean up the environment by restoring it to the 'pre-loop' state.
-	rm(list = setdiff(ls(), loop_env))
-	# Force garbage collection to free up memory
-	gc()
+  file_move(
+    tmp_document_path,
+    final_document_path
+  )
+  # End of loop housekeeping ----
+  # Clean up the environment by restoring it to the 'pre-loop' state.
+  rm(list = setdiff(ls(), loop_env))
+  # Force garbage collection to free up memory
+  gc()
 }
 
 if (dir_exists(temp_root)) {
