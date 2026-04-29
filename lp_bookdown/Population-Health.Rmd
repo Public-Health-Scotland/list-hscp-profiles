@@ -31,11 +31,11 @@ if (is.na(avg_life_exp_latest_male)) {
 ```{r, fig.width = 8, fig.height = 4.5, fig.cap = 'A line graph showing the trent for average life expectancy in the HSCP for male and female residents'}
 ftext(paste0("Figure ", figure_num, ": Average life expectancy in men and women over time"), table_heading_style)
 
-#if (HSCP %in% check_missing_data_scotpho(life_exp)$area_name) {
- # cat("No data available for this HSCP")
-#} else {
-  life_exp_trend
-#}
+# if (HSCP %in% check_missing_data_scotpho(life_exp)$area_name) {
+# cat("No data available for this HSCP")
+# } else {
+life_exp_trend
+# }
 
 figure_num <- figure_num + 1
 ```
