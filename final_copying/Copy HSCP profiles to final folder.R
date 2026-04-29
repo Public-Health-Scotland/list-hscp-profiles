@@ -9,7 +9,7 @@ library(tidyr)
 library(stringr)
 
 # Update the year as needed. The directory will be named '{year} Final Profiles'
-year <- "2025-April"
+year <- "2026-April"
 
 # Set top level file path
 lp_path <- path(
@@ -17,7 +17,7 @@ lp_path <- path(
 )
 
 # Set paths for the existing / new locations of the profiles
-output_dir <- path(lp_path, "Master RMarkdown Document & Render Code", "Output")
+output_dir <- path(lp_path, "Profiles Output Apr26")
 # The directory will be created automatically.
 final_dir <- path(lp_path, "Final Profiles", str_glue("{year} Final Profiles"))
 
@@ -41,12 +41,12 @@ profile_lookup <- tibble(
   )
 ) |>
   # Drop any rows which didn't match a hscp (usually temp files etc.)
-  drop_na(hscp)
-# Add columns for the new directory (HSCP name) and the new path
-mutate(
-  new_dir = path(final_dir, hscp),
-  new_path = path(new_dir, file_name)
-)
+  drop_na(hscp) |>
+  # Add columns for the new directory (HSCP name) and the new path
+  mutate(
+    new_dir = path(final_dir, hscp),
+    new_path = path(new_dir, file_name)
+  )
 
 # Create the new directories (if needed)
 # Set the permissions correctly so we can edit the files if needed

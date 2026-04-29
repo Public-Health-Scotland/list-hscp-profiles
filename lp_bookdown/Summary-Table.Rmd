@@ -33,7 +33,6 @@ headings <- c(
 
 ```{r summary_table_func, include=FALSE}
 make_summary_table <- function(data) {
-<<<<<<< HEAD
   info_cols <- 1:4
   other_loc_cols <- 5:(ncol(data) - 2)
   hscp_col <- ncol(data) - 1
