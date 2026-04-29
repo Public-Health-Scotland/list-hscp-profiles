@@ -960,7 +960,7 @@ title <- ggdraw() +
   draw_label(
     str_wrap(
       glue(
-        "Prevalence of Physical Long-Term Conditions {latest_year_ltc} in the {HSCP} HSCP"
+        "Percentage Estimate of Physical Long-Term Conditions {latest_year_ltc} in the {HSCP} HSCP"
       ),
       width = 65
     ),
