@@ -57,6 +57,13 @@ file_copy(cover_page_path, tmp_cover_page_path, overwrite = TRUE)
 local_lp_bookdown <- file_temp(pattern = "lp_bookdown-")
 dir_copy("lp_bookdown", local_lp_bookdown)
 
+library(httr)
+
+old_cfg <- httr::set_config(
+  httr::config(connecttimeout = 15, timeout = 90)
+)
+on.exit(httr::set_config(old_cfg, override = TRUE), add = TRUE)
+
 # Loop over HSCP ----
 # 'looping' over one HSCP is fine.
 
