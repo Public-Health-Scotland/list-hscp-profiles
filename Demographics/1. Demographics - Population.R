@@ -300,8 +300,8 @@ hscp_pop_proj_weight <- hscp_pop_proj %>%
       age > 84 ~ "Pop85Plus"
     )
   ) %>%
-  # projection until 2028
-  filter(year %in% pop_max_year:2028) %>%
+  # projection until 2033
+  filter(year %in% pop_max_year:2033) %>%
   # aggregate to age groups
   group_by(year, hscp2019, hscp2019name, sex, age_group) %>%
   summarise(pop = sum(pop)) %>%
@@ -460,7 +460,7 @@ pop_graph_text <- ifelse(
 
 ## Pop projection
 pop_proj_change <- 100 *
-  abs(pop_proj_dat[1, 2] - pop_proj_dat[6, 2]) /
+  abs(pop_proj_dat[1, 2] - pop_proj_dat[10, 2]) /
   pop_proj_dat[1, 2]
 pop_proj_change <- round_half_up(pop_proj_change, 1) %>% as.character()
 
@@ -469,10 +469,10 @@ pop_proj_text <- paste(
   HSCP,
   "is estimated to",
   ifelse(
-    pop_proj_dat[1, 2] < pop_proj_dat[6, 2],
+    pop_proj_dat[1, 2] < pop_proj_dat[10, 2],
     paste0("increase by ", pop_proj_change, "%"),
     ifelse(
-      pop_proj_dat[1, 2] == pop_proj_dat[6, 2],
+      pop_proj_dat[1, 2] == pop_proj_dat[10, 2],
       "remain the same",
       paste0("decrease by ", pop_proj_change, "%")
     )
@@ -480,7 +480,7 @@ pop_proj_text <- paste(
   "from ",
   pop_proj_dat[1, 1],
   " to ",
-  pop_proj_dat[6, 1]
+  pop_proj_dat[10, 1]
 )
 
 
