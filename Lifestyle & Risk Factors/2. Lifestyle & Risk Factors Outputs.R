@@ -20,7 +20,7 @@
 ext_year <- 2025
 
 # Set file path
-# lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
+#lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
 
 # Source in functions code
 # source("Master RMarkdown Document & Render Code/Global Script.R")
@@ -94,7 +94,7 @@ bowel_screening <- readRDS(paste0(
   "/scotpho_data_extract_bowel_screening.RDS"
 )) %>%
   clean_scotpho_dat() %>%
-  mutate(period_short = gsub("to", "-", substr(period, 1, 12), fixed = TRUE))
+  mutate(period_short = gsub("to", "-", substr(period, 1, 11), fixed = TRUE))
 
 check_missing_data_scotpho(bowel_screening)
 
@@ -418,14 +418,14 @@ bowel_screening_earliest <- filter(
 )$measure
 
 bowel_screening_change <- abs(
-  (bowel_screening_latest - bowel_screening_earliest) /
-    bowel_screening_earliest *
-    100
+  (bowel_screening_latest - bowel_screening_earliest)# /
+    #bowel_screening_earliest *
+    #100
 )
 bowel_screening_change_word <- if_else(
   bowel_screening_latest > bowel_screening_earliest,
-  "increase",
-  "decrease"
+  "percentage point increase",
+  "percentage point decrease"
 )
 
 
