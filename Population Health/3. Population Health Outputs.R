@@ -15,7 +15,7 @@ library(png)
 library(flextable)
 library(officer)
 
-# Determine locality (for testing only)
+## Determine locality (for testing only)
 # HSCP <- 'East Renfrewshire'
 
 # Set year of data extracts for folder
@@ -523,12 +523,12 @@ adp_presc_earliest <- filter(
 )$measure
 
 adp_presc_perc_change <- abs(
-  (adp_presc_latest - adp_presc_earliest) * 100 / adp_presc_earliest
+  (adp_presc_latest - adp_presc_earliest) #* 100 / adp_presc_earliest
 )
 adp_presc_changeword <- if_else(
   adp_presc_latest > adp_presc_earliest,
-  "increase",
-  "decrease"
+  "percentage point increase",
+  "percentage point decrease"
 )
 
 scot_adp_presc <- filter(
@@ -909,9 +909,9 @@ ltc_multimorbidity_ov65_perc <- sum(
 
 # ###### 3c Prevalence of LTC Types ######
 ltc_types <- ltc_age_grouped %>%
-  select(-hscp_locality, -total_ltc, -people) %>%
+  select(-hscp_locality, -total_ltc, -people, -age_group) %>%
   filter(hscp2019name == HSCP) %>%
-  group_by(hscp2019name, age_group) %>%
+  group_by(hscp2019name) %>%
   summarise(across(everything(), sum)) %>%
   ungroup() |>
   pivot_longer(
