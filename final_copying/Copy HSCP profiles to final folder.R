@@ -58,4 +58,6 @@ file_copy(
   new_path = pull(profile_lookup, new_path)
 )
 
-system("chgrp LIST_analytics '/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/Final Profiles/2026-April Final Profiles [update]' -R")
+system(
+  "chgrp LIST_analytics '/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/Final Profiles/2026-April Final Profiles [update]' -R"
+)
