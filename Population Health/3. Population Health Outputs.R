@@ -79,7 +79,7 @@ life_exp <- bind_rows(life_exp_male, life_exp_fem) |>
 
 rm(life_exp_fem, life_exp_male)
 
-check_missing_data_scotpho(life_exp)
+check_missing_data_scotpho_hscp(life_exp)
 
 ## Deaths aged 15-44
 deaths_15_44 <- read_parquet(path(
@@ -87,9 +87,9 @@ deaths_15_44 <- read_parquet(path(
   "scotpho_data_extract_deaths_15_44.parquet"
 )) |>
   clean_scotpho_dat() |>
-  mutate(period_short = gsub("to", "-", substr(period, 1, 12), fixed = TRUE))
+  mutate(period_short = gsub("to", "-", substr(period, 1, 11), fixed = TRUE))
 
-check_missing_data_scotpho(deaths_15_44)
+check_missing_data_scotpho_hscp(deaths_15_44)
 
 ## Cancer registrations
 cancer_reg <- read_parquet(path(
@@ -99,7 +99,7 @@ cancer_reg <- read_parquet(path(
   clean_scotpho_dat() |>
   mutate(period_short = gsub("to", "-", substr(period, 1, 12), fixed = TRUE))
 
-check_missing_data_scotpho(cancer_reg)
+check_missing_data_scotpho_hscp(cancer_reg)
 
 ## Early deaths cancer
 early_deaths_cancer <- read_parquet(path(
@@ -109,7 +109,7 @@ early_deaths_cancer <- read_parquet(path(
   clean_scotpho_dat() |>
   mutate(period_short = gsub("to", "-", substr(period, 1, 12), fixed = TRUE))
 
-check_missing_data_scotpho(early_deaths_cancer)
+check_missing_data_scotpho_hscp(early_deaths_cancer)
 
 
 ## Asthma hospitalisations
@@ -121,7 +121,7 @@ asthma_hosp <- read_parquet(path(
   mutate(period_short = gsub("to", "-", substr(period, 1, 18), fixed = TRUE)) # |>
 #filter(year != 2023)
 
-check_missing_data_scotpho(asthma_hosp)
+check_missing_data_scotpho_hscp(asthma_hosp)
 
 ## CHD hospitalisations
 chd_hosp <- read_parquet(path(
@@ -131,7 +131,7 @@ chd_hosp <- read_parquet(path(
   clean_scotpho_dat() |>
   mutate(period_short = gsub("to", "-", substr(period, 1, 18), fixed = TRUE))
 
-check_missing_data_scotpho(chd_hosp)
+check_missing_data_scotpho_hscp(chd_hosp)
 
 ## COPD hospitalisations
 copd_hosp <- read_parquet(path(
@@ -141,7 +141,7 @@ copd_hosp <- read_parquet(path(
   clean_scotpho_dat() |>
   mutate(period_short = gsub("to", "-", substr(period, 1, 18), fixed = TRUE))
 
-check_missing_data_scotpho(copd_hosp)
+check_missing_data_scotpho_hscp(copd_hosp)
 
 ## Anxiety/depression/psychosis prescriptions
 adp_presc <- read_parquet(path(
@@ -151,7 +151,7 @@ adp_presc <- read_parquet(path(
   clean_scotpho_dat() |>
   mutate(period_short = substr(period, 1, 7))
 
-check_missing_data_scotpho(adp_presc)
+check_missing_data_scotpho_hscp(adp_presc)
 
 
 # Long-term conditions
