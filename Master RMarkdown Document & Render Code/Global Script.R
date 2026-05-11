@@ -606,7 +606,18 @@ check_missing_data_scotpho <- function(data) {
     select(area_name)
 }
 
-
+check_missing_data_scotpho_hscps <- function(data) {
+  data |>
+    filter(area_type == "HSCP") |>
+    filter(year == max(year)) |>
+    right_join(
+      hscps,
+      by = c("area_name" = "hscp2019name"),
+      multiple = "any"
+    ) |>
+    filter(is.na(indicator)) |>
+    select(area_name)
+}
 ### Unscheduled care functions - can be used across other topics ### ----
 
 # Reformat age groups to specific strings shown i.e. add spaces
