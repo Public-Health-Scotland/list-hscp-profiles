@@ -7,10 +7,6 @@
 ## Code used to create infographics, charts, and figures for the Lifestyle & Risk factors
 #  section of the locality profiles.
 
-## Original script Lucy Dewhurst
-## Original date 10/01/2020
-## October 2022 rewrote parts for smoother process (edits by C.Puech)
-
 ############# 1) PACKAGES, DIRECTORY, LOOKUPS, DATA IMPORT + CLEANING #############
 
 # Determine HSCP
@@ -23,7 +19,7 @@ ext_year <- 2025
 #lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
 
 # Source in functions code
-# source("Master RMarkdown Document & Render Code/Global Script.R")
+#source("Master RMarkdown Document & Render Code/Global Script.R")
 
 # ScotPHO time trend will only be latest 10 years
 trend_years <- 10
