@@ -606,7 +606,7 @@ check_missing_data_scotpho <- function(data) {
     select(area_name)
 }
 
-check_missing_data_scotpho_hscps <- function(data) {
+check_missing_data_scotpho_hscp <- function(data) {
   data |>
     filter(area_type == "HSCP") |>
     filter(year == max(year)) |>
