@@ -195,6 +195,10 @@ count_localities <- function(locality_lookup, hscp_name) {
   return(sum(locality_lookup[["hscp2019name"]] == hscp_name))
 }
 
+hscps <- read_in_localities() |> 
+  select(hscp2019name) |> 
+  unique()
+
 ## Function to read in latest SPD file ----
 
 # No arguments needed, just use read_in_latest_postcodes()
