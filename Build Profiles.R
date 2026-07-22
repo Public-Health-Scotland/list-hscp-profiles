@@ -140,7 +140,7 @@ for (HSCP in hscp_list) {
   file_move(path = tmp_document_path, new_path = final_document_path)
   # Set the file ownership correctly
   file_chown(path = final_document_path, group_id = "LIST_analytics")
-  
+
   # End of loop housekeeping ----
   # Clean up the environment by restoring it to the 'pre-loop' state.
   rm(list = setdiff(ls(), loop_env))
