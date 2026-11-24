@@ -137,13 +137,13 @@ for (HSCP in hscp_list) {
     file_delete(final_document_path)
   }
 
-    if (!dir_exists(path_dir(final_document_path))) {
-      dir_create(path_dir(final_document_path), recurse = TRUE)
-    }
+  if (!dir_exists(path_dir(final_document_path))) {
+    dir_create(path_dir(final_document_path), recurse = TRUE)
+  }
 
-    if (file_exists(final_document_path)) {
-      file_delete(final_document_path)
-    }
+  if (file_exists(final_document_path)) {
+    file_delete(final_document_path)
+  }
 
   # End of loop housekeeping ----
   # Clean up the environment by restoring it to the 'pre-loop' state.
