@@ -1,28 +1,14 @@
 # LOCALITY PROFILES DEMOGRAPHICS: SIMD
 
-### First Created: 08/08/2019
-### Original Author: Aidan Morrison
-
-### Written for: RStudio Server Pro, R Version 3.6.1
-
-### Description: The purpose of this code is to produce outputs on deprivation to be
-###              used for LIST locality profiles produced in RMarkdown.
-
-### Revised Oct/Nov 2022 by Craig Fraser and Luke Taylor for smoother process, ex:
-# Incorporated lookup functions so less dependent on static files
-
-### Script restructuring Nov 22 by C Puech
-
 # SECTION 1: Packages, file paths, etc ----
 
 ## Libraries
 library(reshape2)
-library(ggrepel)
-library(sf)
 
 # Source in global functions/themes script
 # source("Master RMarkdown Document & Render Code/Global Script.R")
 
+# lp_path <- "/conf/LIST_analytics/West Hub/02 - Scaled Up Work/RMarkdown/Locality Profiles/"
 ## Final document will loop through a list of HSCPs
 # Create placeholder for for loop
 # HSCP <- "Moray"
